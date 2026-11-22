@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d1b">
+<title>ORBIT - Personal AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#080d1b;color:#eaf1ff;
+ font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+ min-height:100vh;
+}
+header{
+ padding:22px 20px;border-bottom:1px solid #26334d;
+ display:flex;align-items:center;gap:13px;
+}
+.logo{
+ width:43px;height:43px;border-radius:50%;
+ background:linear-gradient(135deg,#25d9ff,#795bff);
+ display:grid;place-items:center;
+ font-size:22px;box-shadow:0 0 25px #287bff66;
+}
+header h1{margin:0;font-size:21px;letter-spacing:3px}
+header small{color:#8297bd;font-size:10px;letter-spacing:2px}
+main{max-width:650px;margin:auto;padding:20px}
+.profile{text-align:center;padding:27px 0 20px}
+.orb{
+ width:105px;height:105px;margin:auto;
+ border-radius:50%;
+ background:radial-gradient(circle at 35% 30%,#9af4ff,#367aff 45%,#3421a0 75%);
+ box-shadow:0 0 35px #3c9dff88;
+ display:grid;place-items:center;font-size:39px;
+}
+.profile h2{letter-spacing:4px;margin:17px 0 5px}
+.profile p{color:#8498bd;font-size:12px}
+.status{color:#55e7c2;font-size:11px}
+.chat{
+ height:43vh;min-height:260px;overflow-y:auto;
+ border:1px solid #263652;border-radius:18px;
+ padding:15px;background:#101a2c;
+}
+.message{
+ padding:12px 14px;border-radius:14px;
+ margin:10px 0;max-width:88%;
+ font-size:14px;line-height:1.7;white-space:pre-wrap;
+}
+.ai{background:#1b2d49;border:1px solid #2b4970}
+.user{background:#344a85;margin-left:auto}
+.label{font-size:10px;color:#83b8ff;margin-bottom:5px}
+.controls{display:flex;gap:9px;margin-top:13px}
+input{
+ min-width:0;flex:1;background:#142239;
+ border:1px solid #30476a;border-radius:13px;
+ color:white;padding:14px;font-size:16px;
+}
+button{
+ background:#397cf5;color:white;border:0;
+ border-radius:12px;padding:0 19px;font-size:14px;
+}
+button:active{opacity:.7}
+.settings{
+ margin-top:24px;padding:17px;
+ border:1px solid #263652;border-radius:16px;
+}
+.settings h3{margin-top:0;font-size:14px}
+.settings label{display:block;color:#94a9ca;font-size:12px;margin:12px 0 6px}
+.settings input{width:100%;display:block}
+.actions{display:flex;gap:10px;margin-top:14px}
+.actions button{padding:12px;font-size:12px}
+footer{text-align:center;color:#647895;font-size:10px;padding:25px}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">✦</div>
+ <div>
+  <h1>ORBIT</h1>
+  <small>PERSONAL INTELLIGENCE</small>
+ </div>
+</header>
+
+<main>
+ <section class="profile">
+  <div class="orb">✧</div>
+  <h2 id="displayName">ORBIT</h2>
+  <p>あなた専用のパーソナルAI</p>
+  <div class="status">● SYSTEM ONLINE</div>
+ </section>
+
+ <div class="chat" id="chat">
+  <div class="message ai">
+   <div class="label">ORBIT</div>
+   こんにちは。私はORBITです。<br>
+   これから一緒に、いろいろなことを考えていきましょう。<br>
+   今日は何を話しますか？
+  </div>
+ </div>
+
+ <div class="controls">
+  <input id="input" placeholder="ORBITに話しかける..." maxlength="1000">
+  <button id="send">送信</button>
+ </div>
+
+ <section class="settings">
+  <h3>✦ AI PERSONALITY</h3>
+  <label>AIの名前</label>
+  <input id="name" value="ORBIT" maxlength="30">
+  <label>性格・人格</label>
+  <input id="personality" value="冷静で知的、親切で好奇心旺盛" maxlength="200">
+  <div class="actions">
+   <button id="save">設定を保存</button>
+   <button id="clear">会話を消去</button>
+  </div>
+ </section>
+</main>
+
+<footer>ORBIT PERSONAL AI · VERSION 0.1</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let history = JSON.parse(localStorage.getItem("orbit_history") || "[]");
+let settings = JSON.parse(localStorage.getItem("orbit_settings") || "{}");
+
+$("name").value = settings.name || "ORBIT";
+$("personality").value =
+ settings.personality || "冷静で知的、親切で好奇心旺盛";
+$("displayName").textContent = $("name").value;
+
+function saveHistory(){
+ localStorage.setItem("orbit_history",JSON.stringify(history));
+}
+
+function addMessage(role,text){
+ const item = document.createElement("div");
+ item.className = "message " + role;
+ const label = document.createElement("div");
+ label.className = "label";
+ label.textContent = role === "ai" ? $("name").value : "YOU";
+ const content = document.createElement("div");
+ content.textContent = text;
+ item.append(label,content);
+ $("chat").appendChild(item);
+ $("chat").scrollTop = $("chat").scrollHeight;
+}
+
+function respond(text){
+ const p = $("personality").value;
+ if(/こんにちは|おはよう|こんばんは/.test(text))
+  return "こんにちは！今日もお話しできてうれしいです。今日はどんなことを話しましょう？";
+ if(/名前/.test(text))
+  return "私の名前は" + $("name").value + "です。あなた専用のAIとしてここにいます。";
+ if(/覚えて|記憶/.test(text))
+  return "このアプリでは会話履歴を保存できます。設定や過去の会話を確認してみてください。";
+ if(/ありがとう/.test(text))
+  return "どういたしまして。いつでも話しかけてくださいね。";
+ return "「" + text + "」ですね。もっと詳しく聞かせてください。私は" + p + "という性格で、あなたとの会話を大切にします。";
+}
+
+function send(){
+ const text = $("input").value.trim();
+ if(!text)return;
+ $("input").value = "";
+ history.push({role:"user",text});
+ addMessage("user",text);
+ const reply = respond(text);
+ history.push({role:"ai",text:reply});
+ addMessage("ai",reply);
+ saveHistory();
+}
+
+$("send").addEventListener("click",send);
+$("input").addEventListener("keydown",e=>{
+ if(e.key==="Enter")send();
+});
+
+$("save").addEventListener("click",()=>{
+ settings={
+  name:$("name").value.trim() || "ORBIT",
+  personality:$("personality").value.trim()
+ };
+ localStorage.setItem("orbit_settings",JSON.stringify(settings));
+ $("displayName").textContent=settings.name;
+ alert("ORBITの設定を保存しました！");
+});
+
+$("clear").addEventListener("click",()=>{
+ if(!confirm("保存された会話履歴を消去しますか？"))return;
+ history=[];
+ saveHistory();
+ $("chat").innerHTML="";
+ addMessage("ai","会話履歴をリセットしました。またお話ししましょう。");
+});
+
+history.forEach(m=>addMessage(m.role,m.text));
+</script>
+</body>
+</html>
