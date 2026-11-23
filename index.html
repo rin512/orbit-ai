@@ -197,5 +197,67 @@ $("clear").addEventListener("click",()=>{
 
 history.forEach(m=>addMessage(m.role,m.text));
 </script>
+
+<!-- ORBIT IMAGE INPUT -->
+<section id="orbitImageBox" style="
+  margin:20px;
+  padding:20px;
+  border:1px solid #168cff;
+  border-radius:18px;
+  background:#101d35;
+  color:#eaf1ff;
+">
+  <h2>🖼️ ORBIT IMAGE</h2>
+  <p>画像を選択してORBITに読み込ませよう。</p>
+
+  <input
+    id="orbitImageInput"
+    type="file"
+    accept="image/*"
+    style="max-width:100%;"
+  >
+
+  <div style="margin-top:15px;">
+    <img
+      id="orbitImagePreview"
+      alt="選択した画像"
+      style="
+        display:none;
+        max-width:100%;
+        max-height:300px;
+        border-radius:12px;
+      "
+    >
+  </div>
+
+  <p id="orbitImageStatus">画像はまだ選択されていません。</p>
+</section>
+
+<script>
+(function () {
+  const input = document.getElementById("orbitImageInput");
+  const preview = document.getElementById("orbitImagePreview");
+  const status = document.getElementById("orbitImageStatus");
+  let currentUrl = null;
+
+  input.addEventListener("change", function () {
+    const file = input.files[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      status.textContent = "画像ファイルを選んでね。";
+      return;
+    }
+
+    if (currentUrl) URL.revokeObjectURL(currentUrl);
+
+    currentUrl = URL.createObjectURL(file);
+    preview.src = currentUrl;
+    preview.style.display = "block";
+    status.textContent = "画像を読み込んだよ！";
+  });
+})();
+</script>
 </body>
 </html>
